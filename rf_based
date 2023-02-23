@@ -1,0 +1,32 @@
+library(caret)
+library(pls)
+library(MASS)
+
+# Load data
+data(Proteomics)
+
+# Split data into features and labels
+X <- Proteomics[, 1:100] # select first 100 variables
+Y <- Proteomics$Class
+
+# Perform preprocessing
+X <- scale(X) # standardize data
+X_pca <- prcomp(X, scale = TRUE) # PCA
+X_pls <- pls::plsr(X, Y, ncomp = 10) # PLS
+X_lasso <- MASS::lasso(X, Y) # Lasso regression
+
+set.seed(123)
+trainIndex <- createDataPartition(Y, p = 0.8, list = FALSE)
+X_train <- X[trainIndex, ]
+Y_train <- Y[trainIndex]
+X_test <- X[-trainIndex, ]
+Y_test <- Y[-trainIndex]
+
+# Train a classification model using random forest algorithm
+model <- train(X_train, Y_train, method = "rf")
+
+# Make predictions on test set
+predictions <- predict(model, newdata = X_test)
+
+# Evaluate model performance
+confusionMatrix(predictions, Y_test)
