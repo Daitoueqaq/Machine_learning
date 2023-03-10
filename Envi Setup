@@ -1,0 +1,7 @@
+########## change packages diectory #############
+set PYTHONPATH=D:\PythonPackages
+pip install --target=D:\PythonPackages some_package_name
+import some_package_name
+print(some_package_name.__file__)
+
+pip list
